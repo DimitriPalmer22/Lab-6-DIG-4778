@@ -10,28 +10,36 @@ public class Program
         { new("Dense Woods"), new("North of House"), new("Clearing") }
     };
 
+    // Room dictionary
+    private static readonly Dictionary<string, Room> RoomMap = new();
+
     private static (int X, int Y) _location = (1, 1);
 
     private static Room CurrentRoom => Rooms[_location.Y, _location.X];
 
     private static void InitializeDescriptions()
     {
-        Rooms[0, 0].Description = "You are on a rock-strewn trail.";
-        Rooms[0, 1].Description =
-            "You are facing the south side of a white house. There is no door here, and all the windows are barred.";
-        Rooms[0, 2].Description = "You are at the top of the Great Canyon on its south wall.";
+        // Initialize the room map
+        foreach (var room in Rooms)
+            RoomMap[room.Name] = room;
 
-        Rooms[1, 0].Description = "This is a forest, with trees in all directions around you.";
-        Rooms[1, 1].Description =
+        // Initialize the room descriptions
+        RoomMap["Rocky Trail"].Description = "You are on a rock-strewn trail.";
+        RoomMap["South of House"].Description =
+            "You are facing the south side of a white house. There is no door here, and all the windows are barred.";
+        RoomMap["Canyon View"].Description = "You are at the top of the Great Canyon on its south wall.";
+
+        RoomMap["Forest"].Description = "This is a forest, with trees in all directions around you.";
+        RoomMap["West of House"].Description =
             "You are facing the west side of a white house. There is no door here, and all the windows are barred.";
-        Rooms[1, 2].Description =
+        RoomMap["Behind House"].Description =
             "You are behind the white house. In one corner of the house there is a small window which is slightly ajar.";
 
-        Rooms[2, 0].Description =
+        RoomMap["Dense Woods"].Description =
             "This is a dimly lit forest, with large trees all around. To the east, there appears to be sunlight.";
-        Rooms[2, 1].Description =
+        RoomMap["North of House"].Description =
             "You are facing the north side of a white house. There is no door here, and all the windows are barred.";
-        Rooms[2, 2].Description = "You are in a clearing, with a forest surrounding you on the west and south.";
+        RoomMap["Clearing"].Description = "You are in a clearing, with a forest surrounding you on the west and south.";
     }
 
     private static void Main(string[] args)
@@ -41,6 +49,9 @@ public class Program
         // Initialize the room descriptions
         InitializeDescriptions();
 
+        // Initialize the previous room
+        Room previousRoom = null;
+
         // Initialize the command
         var command = Commands.UNKNOWN;
 
@@ -49,7 +60,15 @@ public class Program
         {
             // Display the current room
             Console.WriteLine($"--{CurrentRoom}--");
-            
+
+            // If the previous room is not the current room, print the description
+            if (previousRoom != CurrentRoom)
+            {
+                Console.WriteLine(CurrentRoom.Description);
+                previousRoom = CurrentRoom;
+            }
+
+
             // Convert the input to a command
             command = ToCommand(Input());
 
