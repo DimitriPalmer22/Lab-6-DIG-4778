@@ -3,16 +3,14 @@
 public class Program
 {
     // Initialize the rooms array
-    private static readonly string[] Rooms =
+    private static readonly string[,] Rooms =
     {
-        "Forest",
-        "West of House",
-        "Behind House",
-        "Clearing",
-        "Canyon View"
+        { "Rocky Trail", "South of House", "Canyon View" },
+        { "Forest", "West of House", "Behind House" },
+        { "Dense Woods", "North of House", "Clearing" }
     };
 
-    private static int _currentRoom = 1;
+    private static (int X, int Y) _location = (1, 1);
 
     private static void Main(string[] args)
     {
@@ -26,7 +24,7 @@ public class Program
         while (command != Commands.QUIT)
         {
             // Display the current room
-            Console.WriteLine($"--{Rooms[_currentRoom]}--");
+            Console.WriteLine($"--{Rooms[_location.Y, _location.X]}--");
 
             // Convert the input to a command
             command = ToCommand(Input());
@@ -90,20 +88,32 @@ public class Program
         switch (input)
         {
             case Commands.NORTH:
+                if (_location.Y < Rooms.GetLength(1) - 1)
+                    _location.Y++;
+                else
+                    return false;
+
+                break;
+
             case Commands.SOUTH:
-                return false;
+                if (_location.Y > 0)
+                    _location.Y--;
+                else
+                    return false;
+
+                break;
 
             case Commands.EAST:
-                if (_currentRoom < Rooms.Length - 1)
-                    _currentRoom++;
+                if (_location.X < Rooms.GetLength(0) - 1)
+                    _location.X++;
                 else
                     return false;
 
                 break;
 
             case Commands.WEST:
-                if (_currentRoom > 0)
-                    _currentRoom--;
+                if (_location.X > 0)
+                    _location.X--;
                 else
                     return false;
 
