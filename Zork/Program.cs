@@ -2,9 +2,22 @@
 
 public class Program
 {
+    // Initialize the rooms array
+    private static readonly string[] Rooms =
+    {
+        "Forest",
+        "West of House",
+        "Behind House",
+        "Clearing",
+        "Canyon View"
+    };
+
+    private static int _currentRoom = 1;
+
     private static void Main(string[] args)
     {
         Console.WriteLine("Welcome to Zork!");
+
 
         // Initialize the command
         var command = Commands.UNKNOWN;
@@ -12,36 +25,37 @@ public class Program
         // Game loop
         while (command != Commands.QUIT)
         {
+            // Display the current room
+            Console.WriteLine($"--{Rooms[_currentRoom]}--");
+
             // Convert the input to a command
             command = ToCommand(Input());
+
+            var outputMessage = string.Empty;
 
             // Handle the command
             switch (command)
             {
                 case Commands.LOOK:
-                    Output("A rubber mat saying 'Welcome to Zork!' lies by the door.");
+                    outputMessage = "A rubber mat saying 'Welcome to Zork!' lies by the door.";
                     break;
 
                 case Commands.NORTH:
-                    Output("You moved North.");
-                    break;
-
                 case Commands.SOUTH:
-                    Output("You moved South.");
-                    break;
-
                 case Commands.EAST:
-                    Output("You moved East.");
-                    break;
-
                 case Commands.WEST:
-                    Output("You moved West.");
+                    // If the move was unsuccessful, print that the way is shut
+                    outputMessage = Move(command) ? $"You moved {command}." : "The way is shut!";
                     break;
 
                 case Commands.UNKNOWN:
-                    Output("Unknown command.");
+                    outputMessage = "Unknown command.";
                     break;
             }
+
+            // Output the output message if it is not empty
+            if (!string.IsNullOrWhiteSpace(outputMessage))
+                Output(outputMessage);
         }
 
         // Exit message
@@ -65,6 +79,38 @@ public class Program
     private static void Output(string output)
     {
         Console.WriteLine($"{output}\n");
+    }
+
+    private static bool Move(Commands input)
+    {
+        // If the input is not a direction, throw an error
+        if (input != Commands.NORTH && input != Commands.SOUTH && input != Commands.EAST && input != Commands.WEST)
+            throw new ArgumentException("Invalid direction", nameof(input));
+
+        switch (input)
+        {
+            case Commands.NORTH:
+            case Commands.SOUTH:
+                return false;
+
+            case Commands.EAST:
+                if (_currentRoom < Rooms.Length - 1)
+                    _currentRoom++;
+                else
+                    return false;
+
+                break;
+
+            case Commands.WEST:
+                if (_currentRoom > 0)
+                    _currentRoom--;
+                else
+                    return false;
+
+                break;
+        }
+
+        return true;
     }
 
     /// <summary>
