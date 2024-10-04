@@ -6,21 +6,46 @@ public class Program
     {
         Console.WriteLine("Welcome to Zork!");
 
-        // Get the command from the player
-        var input = Input();
+        // Initialize the command
+        var command = Commands.UNKNOWN;
 
-        // if (input == "quit")
-        //     Console.WriteLine("Thank you for playing!");
-        // else if (input == "look")
-        //     Console.WriteLine(
-        //         "This is an open field west of a white house, with a boarded front door.\nA rubber mat saying 'Welcome to Zork!' lies by the door.");
-        // else
-        //     Console.WriteLine("Unrecognized command.");
+        // Game loop
+        while (command != Commands.QUIT)
+        {
+            // Convert the input to a command
+            command = ToCommand(Input());
 
-        // Convert the input to a command
-        var command = ToCommand(input);
+            // Handle the command
+            switch (command)
+            {
+                case Commands.LOOK:
+                    Output("A rubber mat saying 'Welcome to Zork!' lies by the door.");
+                    break;
 
-        Console.WriteLine($"Command: {command}");
+                case Commands.NORTH:
+                    Output("You moved North.");
+                    break;
+
+                case Commands.SOUTH:
+                    Output("You moved South.");
+                    break;
+
+                case Commands.EAST:
+                    Output("You moved East.");
+                    break;
+
+                case Commands.WEST:
+                    Output("You moved West.");
+                    break;
+
+                case Commands.UNKNOWN:
+                    Output("Unknown command.");
+                    break;
+            }
+        }
+
+        // Exit message
+        Console.WriteLine("Thank you for playing!");
     }
 
     /// <summary>
@@ -35,6 +60,11 @@ public class Program
         var input = Console.ReadLine().Trim().ToLower();
 
         return input;
+    }
+
+    private static void Output(string output)
+    {
+        Console.WriteLine($"{output}\n");
     }
 
     /// <summary>
