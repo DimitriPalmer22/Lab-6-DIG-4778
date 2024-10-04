@@ -1,19 +1,51 @@
-﻿namespace Zork;
+﻿using Newtonsoft.Json;
 
-public class Room
+namespace Zork;
+
+public class Room : IEquatable<Room>
 {
-    public string Name { get; private set; }
+    [JsonProperty(Order = 1)] public string Name { get; private set; }
 
-    public string Description { get; set; }
+    [JsonProperty(Order = 2)] public string Description { get; private set; }
 
-    public Room(string name, string description = "")
+    [JsonProperty(PropertyName = "Neighbors", Order = 3)]
+    private Dictionary<Directions, string> NeighborNames { get; set; }
+
+    [JsonIgnore] public Dictionary<Directions, Room> Neighbors { get; private set; }
+
+    public static bool operator ==(Room lhs, Room rhs)
     {
-        Name = name;
-        Description = description;
+        if (ReferenceEquals(lhs, rhs))
+            return true;
+
+        if (lhs is null || rhs is null)
+            return false;
+
+        return lhs.Name == rhs.Name;
     }
 
-    public override string ToString()
+    public static bool operator !=(Room lhs, Room rhs)
     {
-        return Name;
+        return !(lhs == rhs);
+    }
+
+    public override bool Equals(object? obj) => obj is Room room && this == room;
+
+    public bool Equals(Room other) => this == other;
+
+    public override string ToString() => Name;
+
+    public override int GetHashCode() => Name.GetHashCode();
+
+    public void UpdateNeighbors(World world)
+    {
+        Neighbors =
+            (
+                from entry in NeighborNames
+                let room = world.RoomsByName.GetValueOrDefault(entry.Value)
+                where room != null
+                select (Direction: entry.Key, Room: room)
+            )
+            .ToDictionary(n => n.Direction, n => n.Room);
     }
 }
