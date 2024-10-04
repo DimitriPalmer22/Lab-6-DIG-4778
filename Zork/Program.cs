@@ -2,6 +2,17 @@
 
 public class Program
 {
+    static Program()
+    {
+        // Initialize the room map
+        RoomMap = new();
+        foreach (var room in Rooms)
+            RoomMap[room.Name] = room;
+
+        // Initialize the room descriptions
+        InitializeDescriptions("Content/rooms.txt");
+    }
+
     // Initialize the rooms array
     private static readonly Room[,] Rooms =
     {
@@ -11,43 +22,36 @@ public class Program
     };
 
     // Room dictionary
-    private static readonly Dictionary<string, Room> RoomMap = new();
+    private static readonly Dictionary<string, Room> RoomMap;
 
     private static (int X, int Y) _location = (1, 1);
 
     private static Room CurrentRoom => Rooms[_location.Y, _location.X];
 
-    private static void InitializeDescriptions()
+    private static void InitializeDescriptions(string roomsFileName)
     {
-        // Initialize the room map
-        foreach (var room in Rooms)
-            RoomMap[room.Name] = room;
+        const string fieldDelimiter = "##";
+        const int expectedFieldCount = 2;
 
-        // Initialize the room descriptions
-        RoomMap["Rocky Trail"].Description = "You are on a rock-strewn trail.";
-        RoomMap["South of House"].Description =
-            "You are facing the south side of a white house. There is no door here, and all the windows are barred.";
-        RoomMap["Canyon View"].Description = "You are at the top of the Great Canyon on its south wall.";
+        var lines = File.ReadAllLines(roomsFileName);
 
-        RoomMap["Forest"].Description = "This is a forest, with trees in all directions around you.";
-        RoomMap["West of House"].Description =
-            "You are facing the west side of a white house. There is no door here, and all the windows are barred.";
-        RoomMap["Behind House"].Description =
-            "You are behind the white house. In one corner of the house there is a small window which is slightly ajar.";
+        foreach (var line in lines)
+        {
+            var fields = line.Split(fieldDelimiter);
 
-        RoomMap["Dense Woods"].Description =
-            "This is a dimly lit forest, with large trees all around. To the east, there appears to be sunlight.";
-        RoomMap["North of House"].Description =
-            "You are facing the north side of a white house. There is no door here, and all the windows are barred.";
-        RoomMap["Clearing"].Description = "You are in a clearing, with a forest surrounding you on the west and south.";
+            if (fields.Length != expectedFieldCount)
+                throw new InvalidDataException("Invalid record.");
+
+            var name = fields[0];
+            var description = fields[1];
+
+            RoomMap[name].Description = description;
+        }
     }
 
     private static void Main(string[] args)
     {
         Console.WriteLine("Welcome to Zork!");
-
-        // Initialize the room descriptions
-        InitializeDescriptions();
 
         // Initialize the previous room
         Room previousRoom = null;
