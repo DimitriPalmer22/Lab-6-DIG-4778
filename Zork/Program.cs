@@ -1,4 +1,6 @@
-﻿namespace Zork;
+﻿using Newtonsoft.Json;
+
+namespace Zork;
 
 public class Program
 {
@@ -10,11 +12,11 @@ public class Program
             RoomMap[room.Name] = room;
 
         // Initialize the room descriptions
-        InitializeDescriptions("Content/rooms.txt");
+        InitializeRoomDescriptions("Content/Rooms.json");
     }
 
     // Initialize the rooms array
-    private static readonly Room[,] Rooms =
+    private static Room[,] Rooms =
     {
         { new("Rocky Trail"), new("South of House"), new("Canyon View") },
         { new("Forest"), new("West of House"), new("Behind House") },
@@ -28,25 +30,27 @@ public class Program
 
     private static Room CurrentRoom => Rooms[_location.Y, _location.X];
 
-    private static void InitializeDescriptions(string roomsFileName)
+    private static void InitializeRoomDescriptions(string roomsFileName)
     {
-        const string fieldDelimiter = "##";
-        const int expectedFieldCount = 2;
+        // const string fieldDelimiter = "##";
+        // const int expectedFieldCount = 2;
+        //
+        // var lines = File.ReadAllLines(roomsFileName);
+        //
+        // foreach (var line in lines)
+        // {
+        //     var fields = line.Split(fieldDelimiter);
+        //
+        //     if (fields.Length != expectedFieldCount)
+        //         throw new InvalidDataException("Invalid record.");
+        //
+        //     var name = fields[0];
+        //     var description = fields[1];
+        //
+        //     RoomMap[name].Description = description;
+        // }
 
-        var lines = File.ReadAllLines(roomsFileName);
-
-        foreach (var line in lines)
-        {
-            var fields = line.Split(fieldDelimiter);
-
-            if (fields.Length != expectedFieldCount)
-                throw new InvalidDataException("Invalid record.");
-
-            var name = fields[0];
-            var description = fields[1];
-
-            RoomMap[name].Description = description;
-        }
+        Rooms = JsonConvert.DeserializeObject<Room[,]>(File.ReadAllText(roomsFileName));
     }
 
     private static void Main(string[] args)
