@@ -12,6 +12,8 @@ public class Program
 
     private static (int X, int Y) _location = (1, 1);
 
+    private static string CurrentRoom => Rooms[_location.X, _location.Y];
+
     private static void Main(string[] args)
     {
         Console.WriteLine("Welcome to Zork!");
@@ -34,6 +36,10 @@ public class Program
             // Handle the command
             switch (command)
             {
+                case Commands.QUIT:
+                    outputMessage = "Thank you for playing!";
+                    break;
+
                 case Commands.LOOK:
                     outputMessage = "A rubber mat saying 'Welcome to Zork!' lies by the door.";
                     break;
@@ -47,6 +53,7 @@ public class Program
                     break;
 
                 case Commands.UNKNOWN:
+                default:
                     outputMessage = "Unknown command.";
                     break;
             }
@@ -55,9 +62,6 @@ public class Program
             if (!string.IsNullOrWhiteSpace(outputMessage))
                 Output(outputMessage);
         }
-
-        // Exit message
-        Console.WriteLine("Thank you for playing!");
     }
 
     /// <summary>
@@ -79,10 +83,16 @@ public class Program
         Console.WriteLine($"{output}\n");
     }
 
+    private static bool IsDirection(Commands command)
+    {
+        return command == Commands.NORTH || command == Commands.SOUTH || command == Commands.EAST ||
+               command == Commands.WEST;
+    }
+
     private static bool Move(Commands input)
     {
         // If the input is not a direction, throw an error
-        if (input != Commands.NORTH && input != Commands.SOUTH && input != Commands.EAST && input != Commands.WEST)
+        if (!IsDirection(input))
             throw new ArgumentException("Invalid direction", nameof(input));
 
         switch (input)
