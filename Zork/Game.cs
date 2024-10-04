@@ -4,11 +4,29 @@ namespace Zork;
 
 public class Game
 {
-    public World World { get; private set; }
+    public World World { get; set; }
 
     [JsonIgnore] public Player Player { get; set; }
 
     [JsonIgnore] private bool IsRunning { get; set; }
+
+    [JsonIgnore] public CommandManager CommandManager { get; set; }
+
+
+    public Game()
+    {
+        var commands = new[]
+        {
+            new Command("look", ["look", "l"], (game, ctx) => { Program.Output(game.Player.Location.Description); }),
+            new Command("quit", ["quit", "q"], (game, ctx) => { game.IsRunning = false; }),
+            new Command("north", ["north", "n"], (game, ctx) => { game.Player.Move(Directions.NORTH); }),
+            new Command("south", ["south", "s"], (game, ctx) => { game.Player.Move(Directions.SOUTH); }),
+            new Command("east", ["east", "e"], (game, ctx) => { game.Player.Move(Directions.EAST); }),
+            new Command("west", ["west", "w"], (game, ctx) => { game.Player.Move(Directions.WEST); }),
+        };
+
+        CommandManager = new CommandManager(commands);
+    }
 
     public Game(World world, Player player)
     {
@@ -31,42 +49,14 @@ public class Game
 
             if (Player.Location != previousRoom)
             {
-                Console.WriteLine(Player.Location.Description);
+                CommandManager.PerformCommand(this, "look");
                 previousRoom = Player.Location;
             }
 
-            var command = Program.ToCommand(Program.Input());
-
-            switch (command)
-            {
-                case Commands.QUIT:
-                    IsRunning = false;
-                    break;
-
-                case Commands.LOOK:
-                    outputMessage = Player.Location.Description;
-                    break;
-
-                case Commands.NORTH:
-                case Commands.SOUTH:
-                case Commands.EAST:
-                case Commands.WEST:
-                    var direction = Enum.Parse<Directions>(command.ToString());
-
-                    if (Player.Move(direction) == false)
-                        outputMessage = "The way is shut!";
-                    else
-                        outputMessage = $"Moved {direction}.";
-
-                    break;
-
-                case Commands.UNKNOWN:
-                    outputMessage = "Unknown command.";
-                    break;
-            }
-
-            if (!string.IsNullOrWhiteSpace(outputMessage))
-                Program.Output(outputMessage);
+            if (CommandManager.PerformCommand(this, Program.Input()))
+                Player.Moves++;
+            else
+                Program.Output("That's not a valid command.");
         }
     }
 

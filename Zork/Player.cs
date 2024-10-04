@@ -15,6 +15,8 @@ public class Player
         set => Location = World?.RoomsByName.GetValueOrDefault(value);
     }
 
+    [JsonIgnore] public int Moves { get; set; }
+
     public Player(World world, string startingLocation)
     {
         World = world;

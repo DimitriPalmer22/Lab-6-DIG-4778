@@ -7,9 +7,10 @@ public class World
 {
     [JsonProperty] public string StartingLocation { get; set; }
 
-    private Dictionary<string, Room> _roomsByName;
-
     public HashSet<Room> Rooms { get; set; }
+
+    
+    private Dictionary<string, Room> _roomsByName;
     [JsonIgnore] public IReadOnlyDictionary<string, Room> RoomsByName => _roomsByName;
 
     public Player SpawnPlayer() => new(this, StartingLocation);

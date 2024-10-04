@@ -36,16 +36,4 @@ public class Program
         Console.WriteLine($"{output}\n");
     }
 
-    /// <summary>
-    /// Convert the input to a command.
-    /// </summary>
-    /// <param name="input">A lowercase string</param>
-    /// <returns></returns>
-    public static Commands ToCommand(string input)
-    {
-        if (Enum.TryParse(input, true, out Commands cmd))
-            return cmd;
-
-        return Commands.UNKNOWN;
-    }
 }
